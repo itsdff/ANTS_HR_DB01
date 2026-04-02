@@ -3,9 +3,9 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Clock, UserX, Home, Coffee, BarChart3, Plus, Trash2, Download,
   CalendarDays, StickyNote, AlertTriangle, CalendarOff, Search,
-  Sun, Moon, Users, CheckCircle2, XCircle, Laptop, TrendingUp,
+  Sun, Moon, Users, XCircle, TrendingUp,
   ChevronLeft, ChevronRight, Filter, Edit2, Save, X, Cake,
-  Phone, Droplets, Briefcase, Upload, Bell, GitBranch,
+  Upload, Bell, GitBranch,
   LayoutGrid, Ban, Star, History, UserCheck
 } from "lucide-react";
 import {
@@ -289,7 +289,7 @@ export default function HRDashboard() {
   // ─── Theme ────────────────────────────────────────────────────────────────
   const bg       = darkMode ? "bg-[#0a0a0a]"    : "bg-white";
   const surface  = darkMode ? "bg-[#141414]"    : "bg-white";
-  const surfaceAlt = darkMode ? "bg-[#1a1a1a]"  : "bg-gray-50";
+
   const border   = darkMode ? "border-[#2a2a2a]": "border-gray-200";
   const txt      = darkMode ? "text-white"       : "text-black";
   const txtMuted = darkMode ? "text-gray-400"    : "text-gray-500";
@@ -427,7 +427,13 @@ export default function HRDashboard() {
 
   // ─── Employee CRUD ───────────────────────────────────────────────────────────
   const openAddEmp  = () => { setEditingEmp(null); setEmpForm(EMPTY_EMP); setShowEmpForm(true); };
-  const openEditEmp = (emp: Employee) => { setEditingEmp(emp); const {id,...rest}=emp; void id; setEmpForm(rest); setShowEmpForm(true); };
+  const openEditEmp = (emp: Employee) => {
+    setEditingEmp(emp);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id: _id, ...rest } = emp;
+    setEmpForm(rest);
+    setShowEmpForm(true);
+  };
   const saveEmployee = () => {
     if (!empForm.name.trim()) return;
     if (editingEmp) setEmployees(prev=>prev.map(e=>e.id===editingEmp.id?{...empForm,id:editingEmp.id}:e));
@@ -483,15 +489,6 @@ export default function HRDashboard() {
     </div>
   );
   const sectionTitle=(label:string)=><p className={`text-xs font-bold uppercase tracking-wider mb-3 ${txtMuted}`}>{label}</p>;
-
-  // ─── Org chart depth calculator ──────────────────────────────────────────────
-  const getOrgDepth = (empId: string, allEmps: Employee[], visited=new Set<string>()): number => {
-    if (visited.has(empId)) return 0;
-    visited.add(empId);
-    const emp = allEmps.find(e=>e.id===empId);
-    if (!emp || !emp.reportsTo) return 0;
-    return 1 + getOrgDepth(emp.reportsTo, allEmps, visited);
-  };
 
   // ─── Calendar ────────────────────────────────────────────────────────────────
   const CalendarView=()=>{
@@ -677,15 +674,15 @@ export default function HRDashboard() {
 
         {/* ── Stats bar ────────────────────────────────────────────────────── */}
         <div className="grid grid-cols-4 lg:grid-cols-7 gap-3">
-          {[
-            {label:"Total",   value:todayStats.total,   accent:"border-l-black"},
-            {label:"Present", value:todayStats.present, accent:"border-l-red-600"},
-            {label:"Early",   value:todayStats.early,   accent:"border-l-gray-700"},
-            {label:"Late",    value:todayStats.late,    accent:"border-l-red-400"},
-            {label:"WFH",     value:todayStats.wfh,     accent:"border-l-gray-400"},
-            {label:"On Leave",value:todayStats.onLeave, accent:"border-l-red-300"},
-            {label:"Absent",  value:todayStats.absent,  accent:"border-l-gray-300"},
-          ].map(({label,value,accent})=>(
+          {([
+            ["Total",    todayStats.total,   "border-l-black"],
+            ["Present",  todayStats.present, "border-l-red-600"],
+            ["Early",    todayStats.early,   "border-l-gray-700"],
+            ["Late",     todayStats.late,    "border-l-red-400"],
+            ["WFH",      todayStats.wfh,     "border-l-gray-400"],
+            ["On Leave", todayStats.onLeave, "border-l-red-300"],
+            ["Absent",   todayStats.absent,  "border-l-gray-300"],
+          ] as [string, number, string][]).map(([label, value, accent])=>(
             <div key={label} className={`${cardCls} p-3 flex items-center gap-2 border-l-4 ${accent}`}>
               <div>
                 <div className={`text-xl font-bold ${txt}`}>{value}</div>
