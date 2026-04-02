@@ -627,7 +627,11 @@ export default function HRDashboard() {
 
   const holidayToday = getHoliday(selectedDate);
   const summaryMonthLabel = summaryMonth ? `${MONTHS[parseInt(summaryMonth.slice(5,7))-1]} ${summaryMonth.slice(0,4)}` : "";
-  const allAlerts = [...upcomingBirthdays.map(e=>({type:"birthday" as const,...e})), ...upcomingHolidays.map(h=>({type:"holiday" as const,...h})), ...cessationAlerts.map(e=>({type:"cessation" as const,...e}))];
+  const allAlerts = [
+    ...upcomingBirthdays.map(e  => ({ kind: "birthday"  as const, ...e })),
+    ...upcomingHolidays.map(h   => ({ kind: "holiday"   as const, ...h })),
+    ...cessationAlerts.map(e    => ({ kind: "cessation" as const, ...e })),
+  ];
 
   // ══════════════════════════════════════════════════════════════════════════════
   return (
